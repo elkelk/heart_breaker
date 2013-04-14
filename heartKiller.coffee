@@ -1,7 +1,8 @@
-_u = require('underscore')
+player = require('../cardPlayer')
 thrift = require('thrift')
 Hearts = require('./lib/Hearts')
 types = require('./lib/hearts_types')
+card_player = require('./cardPlayer')
 
 connection = thrift.createConnection('localhost', 4001)
 client = thrift.createClient(Hearts, connection)
@@ -30,6 +31,7 @@ class HeartKiller
     @game.get_hand @ticket, (err, hand) =>
       console.log "hand:", hand
       @hand = hand
+      @cardPlayer = new player.CardPlayer(@hand)
 
       if @roundNumber % 4 != 0
         cardsToPass = hand.splice(0, 3)
@@ -46,7 +48,7 @@ class HeartKiller
       console.log "Leading the trick #{@gameInfo.position}, #{trick}" if @gameInfo.position == trick.leader
       console.log "current trick:", trick
 
-      cardToPlay = @chooseCard(trickNumber, trick)
+      cardToPlay = @cardPlayer.chooseCard(trickNumber, trick)
 
       @hand.splice(@hand.indexOf(cardToPlay), 1)
       console.log "[#{@gameInfo.position}] playing card:", cardToPlay
@@ -66,27 +68,5 @@ class HeartKiller
         else
           @playTrick trickNumber + 1
 
-  chooseCard: (trickNumber, trick) ->
-    if @twoClubs()?
-      console.log "playing two of clubs"
-      @twoClubs()
-    else if trick.played[0]? and @matchingSuit(trick).length > 0
-      # grabs the lowest matching suit
-      console.log "playing matching suit"
-      @matchingSuit(trick)[0]
-    else
-      # grabs the first card (off suit)
-      console.log "playing off suit"
-      @hand[0]
-
-  matchingSuit: (trick) ->
-    suited_cards = _u.filter @hand, (card) ->
-      card.suit == trick.played[0].suit
-    _u.sortBy(suited_cards, (card) -> card.rank)
-
-  twoClubs: () ->
-    _u.find(@hand, (card) -> card.suit == types.Suit.CLUBS && card.rank == types.Rank.TWO)
-
 bot = new HeartKiller(client)
 bot.run()
-

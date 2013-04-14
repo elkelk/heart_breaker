@@ -6,6 +6,10 @@
     "coffee-script": "1.4.x",
     "thrift": "latest",
     "underscore": "latest"
+  },
+  "devDependencies": {
+    "mocha": "1.7.0",
+    "should": "1.2.x",
+    "nodemon": "0.7.x"
   }
 }
-
