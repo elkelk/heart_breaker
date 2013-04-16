@@ -1,28 +1,34 @@
 _u = require('underscore')
 types = require('./lib/hearts_types')
+hand = require('./hand')
+history = require('./history')
+
 class CardPlayer
-  constructor: (hand) ->
-    @hand = hand
+  constructor: (inbound_hand) ->
+    @hand = new hand.Hand(inbound_hand)
+    @history = new history.History()
 
   chooseCard: (trickNumber, trick) ->
-    if @twoClubs()?
+    card = @cardSelector(trickNumber, trick)
+    @hand.play(card)
+    card
+
+  cardSelector: (trickNumber, trick) ->
+    if @hand.twoClubs()?
       console.log "playing two of clubs"
-      @twoClubs()
-    else if trick.played[0]? and @matchingSuit(trick).length > 0
+      @hand.twoClubs()
+
+    else if trick.played[0]? and @hand.matchingSuit(trick).length > 0
       # grabs the lowest matching suit
       console.log "playing matching suit"
-      @matchingSuit(trick)[0]
+      @hand.matchingSuit(trick)[0]
+
     else
       # grabs the first card (off suit)
       console.log "playing off suit"
-      @hand[0]
+      @hand.get(0)
 
-  matchingSuit: (trick) ->
-    suited_cards = _u.filter @hand, (card) ->
-      card.suit == trick.played[0].suit
-    _u.sortBy(suited_cards, (card) -> card.rank)
-
-  twoClubs: () ->
-    _u.find(@hand, (card) -> card.suit == types.Suit.CLUBS && card.rank == types.Rank.TWO)
+  record: (resultTrick) ->
+    @history.record(resultTrick)
 
 module.exports.CardPlayer = CardPlayer

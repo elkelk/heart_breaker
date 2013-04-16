@@ -1,8 +1,7 @@
-player = require('../cardPlayer')
 thrift = require('thrift')
 Hearts = require('./lib/Hearts')
 types = require('./lib/hearts_types')
-card_player = require('./cardPlayer')
+player = require('./cardPlayer')
 
 connection = thrift.createConnection('localhost', 4001)
 client = thrift.createClient(Hearts, connection)
@@ -11,8 +10,9 @@ class HeartKiller
   constructor: (@game) ->
 
   run: ->
-    console.log "Entering arena"
-    @game.enter_arena (err, response) =>
+    request = new types.EntryRequest()
+    console.log "Entering arena", request
+    @game.enter_arena request, (err, response) =>
       @ticket = response.ticket
       if @ticket
         @play()
@@ -54,6 +54,7 @@ class HeartKiller
       console.log "[#{@gameInfo.position}] playing card:", cardToPlay
       @game.play_card @ticket, cardToPlay, (err, trickResult) =>
         console.log "trick: result", trickResult
+        @cardPlayer.record(trickResult)
 
         if trickNumber >= 12
           @game.get_round_result @ticket, (err, roundResult) =>
