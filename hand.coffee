@@ -12,19 +12,37 @@ class Hand
   hasCard: (rank, suit) ->
     _u.find(@hand, (card) -> card.suit == suit && card.rank == rank)
 
+  get: (index) ->
+    @hand[index]
+
+  matchingSuit: (suit) ->
+    suited_cards = _u.filter @hand, (card) ->
+      card.suit == suit
+    _u.sortBy(suited_cards, (card) -> card.rank)
+
+  hearts: () ->
+    @matchingSuit(types.Suit.HEARTS)
+
+  spades: () ->
+    @matchingSuit(types.Suit.SPADES)
+
+  diamonds: () ->
+    @matchingSuit(types.Suit.DIAMONDS)
+
+  clubs: () ->
+    @matchingSuit(types.Suit.CLUBS)
+
   twoClubs: () ->
     @hasCard(types.Rank.TWO, types.Suit.CLUBS)
 
   queenSpades: () ->
     @hasCard(types.Rank.QUEEN, types.Suit.SPADES)
 
-  get: (index) ->
-    @hand[index]
+  aceSpades: () ->
+    @hasCard(types.Rank.ACE, types.Suit.SPADES)
 
-  matchingSuit: (trick) ->
-    suited_cards = _u.filter @hand, (card) ->
-      card.suit == trick.played[0].suit
-    _u.sortBy(suited_cards, (card) -> card.rank)
+  kingSpades: () ->
+    @hasCard(types.Rank.KING, types.Suit.SPADES)
 
 
 module.exports.Hand = Hand

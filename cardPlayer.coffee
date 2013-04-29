@@ -14,19 +14,34 @@ class CardPlayer
     card
 
   cardSelector: (trickNumber, trick) ->
-    if @hand.twoClubs()?
-      console.log "playing two of clubs"
-      @hand.twoClubs()
+    # leading
+    if not trick.played[0]?
+      if @hand.twoClubs()?
+        @hand.twoClubs()
 
-    else if trick.played[0]? and @hand.matchingSuit(trick).length > 0
-      # grabs the lowest matching suit
-      console.log "playing matching suit"
-      @hand.matchingSuit(trick)[0]
+      else if @hand.spades().length > 0 && @hand.spades()[0].rank < 12
+        @hand.spades()[0]
 
+    # following
     else
-      # grabs the first card (off suit)
-      console.log "playing off suit"
-      @hand.get(0)
+      if @hand.matchingSuit(trick.played[0].suit).length > 0
+        @hand.matchingSuit(trick.played[0].suit)[0]
+
+
+      else if @hand.queenSpades()? and trickNumber > 1
+        @hand.queenSpades()
+
+      else if @hand.kingSpades()?
+        @hand.kingSpades()
+
+      else if @hand.aceSpades()?
+        @hand.aceSpades()
+
+      else if @hand.hearts().length > 0 && trickNumber > 1
+        @hand.hearts()[@hand.hearts().length - 1]
+
+      else
+        @hand.get(0)
 
   record: (resultTrick) ->
     @history.record(resultTrick)

@@ -62,7 +62,7 @@ describe "CardPlayer", ->
       { suit: types.Suit.HEARTS, rank: types.Rank.ACE }
     ]
     cardPlayer = new player.CardPlayer(@hand)
-    cardPlayer.chooseCard(2, { leader: 4, played: [ @twoClubs ] } ).suit.should.not.eql(types.Suit.HEARTS)
+    cardPlayer.chooseCard(1, { leader: 4, played: [ @twoClubs ] } ).suit.should.not.eql(types.Suit.HEARTS)
 
   it "shouldn't play the queen of spades the first round", ->
     @hand = [
@@ -81,7 +81,7 @@ describe "CardPlayer", ->
       { suit: types.Suit.HEARTS, rank: types.Rank.ACE }
     ]
     cardPlayer = new player.CardPlayer(@hand)
-    cardPlayer.chooseCard(2, { leader: 4, played: [ @twoClubs ] } ).should.not.eql(@queenSpades)
+    cardPlayer.chooseCard(1, { leader: 4, played: [ @twoClubs ] } ).should.not.eql(@queenSpades)
 
   it "should play the highest heart if we are offsuit and we dont have the queen, king, or ace of spades", ->
     @hand = [
@@ -125,7 +125,7 @@ describe "CardPlayer", ->
 
   it "should play the king of spades if we have it and we are offsuit and don't have the queen, or ace", ->
     @hand = [
-      @threeClubs,
+      @twoClubs,
       @fourClubs,
       { suit: types.Suit.CLUBS, rank: types.Rank.FIVE },
       { suit: types.Suit.CLUBS, rank: types.Rank.SEVEN },
@@ -153,7 +153,7 @@ describe "CardPlayer", ->
       { suit: types.Suit.CLUBS, rank: types.Rank.QUEEN },
       { suit: types.Suit.CLUBS, rank: types.Rank.KING },
       { suit: types.Suit.CLUBS, rank: types.Rank.ACE },
-      @kingSpades,
+      @threeSpades,
       @aceSpades,
       @sixHearts,
       { suit: types.Suit.HEARTS, rank: types.Rank.EIGHT },
@@ -181,10 +181,9 @@ describe "CardPlayer", ->
         { suit: types.Suit.HEARTS, rank: types.Rank.ACE }
       ]
       cardPlayer = new player.CardPlayer(@hand)
-      cardPlayer.chooseCard(1, { leader: 4, played: [] } )
       cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@threeSpades)
 
-    describe "leading with the ace, king, or queen of spades", ->
+    describe "leading with the ace, king, or queen of spades in hand", ->
       it "should lead diamonds if they are the lowest", ->
         @hand = [
           @threeClubs,
