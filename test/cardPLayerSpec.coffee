@@ -183,10 +183,11 @@ describe "CardPlayer", ->
       cardPlayer = new player.CardPlayer(@hand)
       cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@threeSpades)
 
-    describe "leading with the ace, king, or queen of spades in hand", ->
-      it "should lead diamonds if they are the lowest", ->
+    describe "leading with the ace, king, or queen of spades in hand (run out a suit)", ->
+      it "should lead diamonds if we have fewer than clubs", ->
+        expected_card = @threeClubs
         @hand = [
-          @threeClubs,
+          expected_card,
           @fourClubs,
           { suit: types.Suit.CLUBS, rank: types.Rank.FIVE },
           { suit: types.Suit.CLUBS, rank: types.Rank.SEVEN },
@@ -194,7 +195,7 @@ describe "CardPlayer", ->
           { suit: types.Suit.CLUBS, rank: types.Rank.QUEEN },
           { suit: types.Suit.CLUBS, rank: types.Rank.KING },
           { suit: types.Suit.CLUBS, rank: types.Rank.ACE },
-          @twoDiamonds,
+          @fourDiamonds,
           @aceSpades,
           @sixHearts,
           { suit: types.Suit.HEARTS, rank: types.Rank.EIGHT },
@@ -202,19 +203,20 @@ describe "CardPlayer", ->
         ]
         cardPlayer = new player.CardPlayer(@hand)
         cardPlayer.chooseCard(1, { leader: 4, played: [] } )
-        cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@twoDiamonds)
+        cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(expected)
 
-      it "should lead clubs if they are the lowest", ->
+      it "should lead clubs if we have fewer than diamonds", ->
+        expected_card = { suit: types.Suit.CLUBS, rank: types.Rank.FIVE }
         @hand = [
-          @threeClubs,
-          @fourClubs,
-          { suit: types.Suit.CLUBS, rank: types.Rank.FIVE },
+          expected_card,
           { suit: types.Suit.CLUBS, rank: types.Rank.SEVEN },
-          { suit: types.Suit.CLUBS, rank: types.Rank.JACK },
-          { suit: types.Suit.CLUBS, rank: types.Rank.QUEEN },
-          { suit: types.Suit.CLUBS, rank: types.Rank.KING },
-          { suit: types.Suit.CLUBS, rank: types.Rank.ACE },
           @fourDiamonds,
+          { suit: types.Suit.DIAMONDS, rank: types.Rank.FIVE },
+          { suit: types.Suit.DIAMONDS, rank: types.Rank.SEVEN },
+          { suit: types.Suit.DIAMONDS, rank: types.Rank.JACK },
+          { suit: types.Suit.DIAMONDS, rank: types.Rank.QUEEN },
+          { suit: types.Suit.DIAMONDS, rank: types.Rank.KING },
+          { suit: types.Suit.DIAMONDS, rank: types.Rank.ACE },
           @kingSpades,
           @sixHearts,
           { suit: types.Suit.HEARTS, rank: types.Rank.EIGHT },
@@ -222,92 +224,21 @@ describe "CardPlayer", ->
         ]
         cardPlayer = new player.CardPlayer(@hand)
         cardPlayer.chooseCard(1, { leader: 4, played: [] } )
-        cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@threeClubs)
+        cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(expected)
 
-      it "should lead hearts if they are the lowest and they have been broken", ->
-        @hand = [
-          @threeClubs,
-          @fourClubs,
-          { suit: types.Suit.CLUBS, rank: types.Rank.FIVE },
-          { suit: types.Suit.CLUBS, rank: types.Rank.SEVEN },
-          { suit: types.Suit.CLUBS, rank: types.Rank.JACK },
-          { suit: types.Suit.CLUBS, rank: types.Rank.QUEEN },
-          { suit: types.Suit.CLUBS, rank: types.Rank.KING },
-          { suit: types.Suit.CLUBS, rank: types.Rank.ACE },
-          @fourDiamonds,
-          @kingSpades,
-          @twoHearts,
-          { suit: types.Suit.HEARTS, rank: types.Rank.EIGHT },
-          { suit: types.Suit.HEARTS, rank: types.Rank.ACE }
-        ]
-        cardPlayer = new player.CardPlayer(@hand)
-        cardPlayer.history.hearts_broken(true)
-        cardPlayer.chooseCard(1, { leader: 4, played: [] } )
-        cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@twoHearts)
+      describe "out of a suit", ->
 
+        it "should lead clubs if they have the lowest ratio", ->
+        it "should lead clubs if they have the second lowest ratio above hearts but hearts isn't broken", ->
+        it "should lead diamonds if they have the lowest ratio", ->
+        it "should lead diamonds if they have the second lowest ratio above hearts but hearts isn't broken", ->
+        it "should lead hearts if they have the lowest ratio and they have been broken", ->
 
   describe "leading with the queen gone", ->
-    it "should lead diamonds if they are the lowest", ->
-      @hand = [
-        @threeClubs,
-        @fourClubs,
-        { suit: types.Suit.CLUBS, rank: types.Rank.FIVE },
-        { suit: types.Suit.CLUBS, rank: types.Rank.SEVEN },
-        { suit: types.Suit.CLUBS, rank: types.Rank.JACK },
-        { suit: types.Suit.CLUBS, rank: types.Rank.QUEEN },
-        { suit: types.Suit.CLUBS, rank: types.Rank.KING },
-        { suit: types.Suit.CLUBS, rank: types.Rank.ACE },
-        @twoDiamonds,
-        @aceSpades,
-        @sixHearts,
-        { suit: types.Suit.HEARTS, rank: types.Rank.EIGHT },
-        { suit: types.Suit.HEARTS, rank: types.Rank.ACE }
-      ]
-      cardPlayer = new player.CardPlayer(@hand)
-      cardPlayer.history.queenPlayed(true)
-      cardPlayer.chooseCard(1, { leader: 4, played: [] } )
-      cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@twoDiamonds)
-
-    it "should lead clubs if they are the lowest", ->
-      @hand = [
-        @threeClubs,
-        @fourClubs,
-        { suit: types.Suit.CLUBS, rank: types.Rank.FIVE },
-        { suit: types.Suit.CLUBS, rank: types.Rank.SEVEN },
-        { suit: types.Suit.CLUBS, rank: types.Rank.JACK },
-        { suit: types.Suit.CLUBS, rank: types.Rank.QUEEN },
-        { suit: types.Suit.CLUBS, rank: types.Rank.KING },
-        { suit: types.Suit.CLUBS, rank: types.Rank.ACE },
-        @fourDiamonds,
-        @kingSpades,
-        @sixHearts,
-        { suit: types.Suit.HEARTS, rank: types.Rank.EIGHT },
-        { suit: types.Suit.HEARTS, rank: types.Rank.ACE }
-      ]
-      cardPlayer = new player.CardPlayer(@hand)
-      cardPlayer.history.queenPlayed(true)
-      cardPlayer.chooseCard(1, { leader: 4, played: [] } )
-      cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@threeClubs)
-
-    it "should lead hearts if they are the lowest and they are broken", ->
-      @hand = [
-        @threeClubs,
-        @fourClubs,
-        { suit: types.Suit.CLUBS, rank: types.Rank.FIVE },
-        { suit: types.Suit.CLUBS, rank: types.Rank.SEVEN },
-        { suit: types.Suit.CLUBS, rank: types.Rank.JACK },
-        { suit: types.Suit.CLUBS, rank: types.Rank.QUEEN },
-        { suit: types.Suit.CLUBS, rank: types.Rank.KING },
-        { suit: types.Suit.CLUBS, rank: types.Rank.ACE },
-        @fourDiamonds,
-        @kingSpades,
-        @twoHearts,
-        { suit: types.Suit.HEARTS, rank: types.Rank.EIGHT },
-        { suit: types.Suit.HEARTS, rank: types.Rank.ACE }
-      ]
-      cardPlayer = new player.CardPlayer(@hand)
-      cardPlayer.history.queenPlayed(true)
-      cardPlayer.history.hearts_broken(true)
-      cardPlayer.chooseCard(1, { leader: 4, played: [] } )
-      cardPlayer.chooseCard(2, { leader: 3, played: [] } ).should.eql(@twoHearts)
-
+    it "should lead low clubs if they have the lowest ratio", ->
+    it "should lead low clubs if they have the second lowest ratio above hearts but hearts isn't broken", ->
+    it "should lead low diamonds if they have the lowest ratio", ->
+    it "should lead low diamonds if they have the second lowest ratio above hearts but hearts isn't broken", ->
+    it "should lead low spades if they have the lowest ratio", ->
+    it "should lead low spades if they have the second lowest ratio above hearts but hearts isn't broken", ->
+    it "should lead low hearts if they have the lowest ratio and they have been broken", ->
